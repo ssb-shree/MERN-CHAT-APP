@@ -32,7 +32,35 @@ const getAllMessages = async(req,res)=>{
     }
 }
 
-const sendMessage = async(req,res)=>{}
+const sendMessage = async(req,res)=>{
+    try {
+        const {text,image} = req.body;
+
+        const {receiverID} = req.params;
+        const senderID = req.user._id;
+        
+        let imageUrl;
+        if(image){
+            const uploadImage = await cloudinary.uploader.upload(image);
+            imageUrl = uploadImage.secure_url;
+        }
+
+        const newMessage = new Message({
+            senderID,
+            receiverID,
+            text,
+            image:imageUrl
+        })
+
+        await newMessage.save()
+
+        res.status(201).json(newMessage)
+
+    } catch (error) {
+        console.error("unexpected error during sending a message ", error.message || error);
+        res.status(500).json({success:false, message:"unexpected error occcured pls try later"});
+    }
+}
 
 export {
     getSidebarUsers,
