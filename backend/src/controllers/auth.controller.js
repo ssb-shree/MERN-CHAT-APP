@@ -29,7 +29,9 @@ const registerUser = async(req,res)=>{
 
         if(!newUser) return res.status(400).json({sucess:false, message:"failed to create user"});
 
-        res.status(201).json({success:true, message:"created new user successfully", userData:{...newUser._doc, password:nullz}})
+        generateTokens(newUser._id, res)
+
+        res.status(201).json({success:true, message:"created new user successfully", userData:{...newUser._doc, password:null}})
 
     } catch (error) {
         console.error("unexpected error during register user ", error.message || error);
@@ -52,7 +54,7 @@ const loginUser = async(req,res)=>{
 
         generateTokens(userExist._id, res);
 
-        res.status(200).json({sucess:true, message:"user logged in"})        
+        res.status(200).json({sucess:true, message:"user logged in", userData:{...userExist._doc, password:null}})        
     } catch (error) {
         console.error("unexpected error during login user ", error.message || error);
         res.status(500).json({success:false, message:"unexpected error occcured pls try later"});
@@ -62,7 +64,7 @@ const loginUser = async(req,res)=>{
 const logoutUser = async(req,res)=>{
     try {
         res.cookie("jwt", "", {maxAge:0, });
-        res.status(200).json({success:true, message:"user logged out"})
+        res.status(200).json({success:true, message:"user logged out successfully"})
     } catch (error) {
         console.error("unexpected error during logout user ", error.message || error);
         res.status(500).json({success:false, message:"unexpected error occcured pls try later"});
